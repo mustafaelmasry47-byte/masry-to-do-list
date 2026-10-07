@@ -1,755 +1,731 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="dark">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظم المذاكرة والمهام | مصطفى المصري</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        indigo: {
-                            950: '#0B0F19',
-                            900: '#111827',
-                            800: '#1F293D',
-                            700: '#2D3B55',
-                            600: '#4F46E5',
-                            500: '#6366F1',
-                        },
-                        violet: {
-                            500: '#8B5CF6',
-                            600: '#7C3AED',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts: Tajawal -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tajawal Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Canvas Confetti Library -->
+    <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
-        body {
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --accent-indigo: #6366f1;
+            --accent-purple: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --radius: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Tajawal', sans-serif;
-            background: #0B0F19;
-            color: #F3F4F6;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #111827;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4F46E5;
-            border-radius: 999px;
         }
 
-        .glass-card {
-            background: rgba(31, 41, 61, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 70%);
         }
 
-        .glass-card-hover {
-            transition: all 0.25s ease-in-out;
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
         }
-        .glass-card-hover:hover {
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 8px 25px -5px rgba(79, 70, 229, 0.25);
+
+        /* Top Action Bar (Download Button) */
+        .download-bar {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 12px 20px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .download-bar p {
+            font-size: 0.9rem;
+            color: #c7d2fe;
+            font-weight: 500;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-download:hover {
             transform: translateY(-2px);
         }
 
-        .glow-button {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
-        }
-        .glow-button:hover {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.55);
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
-        .timer-progress {
-            stroke-dasharray: 283;
-            stroke-dashoffset: 0;
-            transition: stroke-dashoffset 1s linear;
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 18px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .stat-icon.total { background: rgba(99, 102, 241, 0.2); color: var(--accent-indigo); }
+        .stat-icon.done { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .stat-icon.time { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+
+        .stat-info h3 { font-size: 1.5rem; font-weight: 800; }
+        .stat-info p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f1f5f9;
+        }
+
+        .card-title i { color: var(--accent-indigo); }
+
+        /* Task Form */
+        .task-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-full { grid-column: 1 / -1; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-indigo);
+        }
+
+        .btn-add {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:hover { opacity: 0.9; }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-indigo);
+            color: white;
+            border-color: var(--accent-indigo);
+        }
+
+        /* Tasks List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .task-item.completed { opacity: 0.5; }
+        .task-item.completed .task-title { text-decoration: line-through; }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .task-item.completed .checkbox-custom {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .checkbox-custom i { font-size: 0.75rem; color: white; display: none; }
+        .task-item.completed .checkbox-custom i { display: block; }
+
+        .task-title { font-weight: 700; font-size: 0.95rem; }
+
+        .task-badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 0.72rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+        }
+
+        .badge.subj { color: #818cf8; background: rgba(99, 102, 241, 0.15); }
+        .badge.high { color: #f87171; background: rgba(239, 68, 68, 0.15); }
+        .badge.medium { color: #fbbf24; background: rgba(245, 158, 11, 0.15); }
+        .badge.low { color: #34d399; background: rgba(16, 185, 129, 0.15); }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 6px;
+        }
+
+        .btn-delete:hover { color: var(--accent-red); }
+
+        /* Timer Box */
+        .timer-card { text-align: center; }
+
+        .timer-modes {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-indigo);
+            color: white;
+            border-color: var(--accent-indigo);
+        }
+
+        .timer-clock {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: var(--accent-indigo);
+            font-family: monospace;
+            margin: 15px 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-timer {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-timer.start { background: var(--accent-indigo); color: white; }
+        .btn-timer.reset { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+        /* Footer Text */
+        .footer {
+            text-align: center;
+            padding: 20px 0 10px;
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .footer p span {
+            color: #cbd5e1;
+            font-weight: 600;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white antialiased">
+<body>
 
-    <div>
-        <!-- Header Nav -->
-        <header class="sticky top-0 z-40 bg-indigo-950/80 backdrop-blur-xl border-b border-white/10 shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-                <!-- Logo & Title -->
-                <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i class="fa-solid fa-graduation-cap text-xl text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-200 bg-clip-text text-transparent">منظم المذاكرة الذكي</h1>
-                        <p class="text-xs text-indigo-300/70 font-medium">خطط لدراستك، أنجز مهامك، وتابع تقدمك بكل سلاسة</p>
-                    </div>
-                </div>
+    <div class="container">
 
-                <!-- Header Actions -->
-                <div class="flex items-center gap-3">
-                    <button id="openNewTaskModal" class="glow-button flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>مهمة جديدة</span>
-                    </button>
-                </div>
-            </div>
+        <!-- Top Direct File Download Bar -->
+        <div class="download-bar">
+            <p><i class="fa-solid fa-file-arrow-down"></i> اضغط للتحميل المباشر لتشغيل الويب سايت على جهازك بدون إنترنت:</p>
+            <button class="btn-download" id="downloadAppBtn">
+                <i class="fa-solid fa-download"></i> تحميل ملف التطبيق
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1>منظم المذاكرة وقوائم المهام</h1>
+            <p>تابع دروسك اليومية، نظم أوقات المذاكرة، وركز مع مؤقت البومودورو</p>
         </header>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-            <!-- Sidebar Column (Timer + Stats + Subjects) -->
-            <aside class="lg:col-span-4 space-y-6">
-
-                <!-- Pomodoro Timer Box -->
-                <div class="glass-card rounded-3xl p-6 relative overflow-hidden shadow-xl">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex items-center gap-2.5">
-                            <i class="fa-solid fa-stopwatch text-indigo-400 text-lg"></i>
-                            <h2 class="font-bold text-base text-slate-100">مؤقت التركيز (Pomodoro)</h2>
-                        </div>
-                        <span id="timerModeLabel" class="text-xs px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full font-bold">جلسة مذاكرة</span>
-                    </div>
-
-                    <!-- Timer Circle Display -->
-                    <div class="relative w-48 h-48 mx-auto my-4 flex items-center justify-center">
-                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" class="stroke-indigo-900/50" stroke-width="5" fill="transparent"/>
-                            <circle id="timerCircle" cx="50" cy="50" r="45" class="stroke-indigo-500 timer-progress" stroke-width="5" stroke-linecap="round" fill="transparent"/>
-                        </svg>
-                        <div class="absolute flex flex-col items-center justify-center text-center px-2">
-                            <span id="timerDisplay" class="text-4xl font-black tracking-wider text-white font-mono drop-shadow-md">25:00</span>
-                            <span id="activeTaskLabel" class="text-xs text-indigo-300/70 mt-2 max-w-[140px] truncate">بدون مهمة محددة</span>
-                        </div>
-                    </div>
-
-                    <!-- Timer Buttons -->
-                    <div class="flex justify-center items-center gap-3 mt-6">
-                        <button id="toggleTimerBtn" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white py-3 px-4 rounded-xl font-bold text-sm shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
-                            <i id="playPauseIcon" class="fa-solid fa-play"></i>
-                            <span id="playPauseText">ابدأ التركيز</span>
-                        </button>
-                        <button id="resetTimerBtn" class="p-3 bg-indigo-900/40 hover:bg-indigo-900/80 text-indigo-300 border border-indigo-500/20 rounded-xl transition">
-                            <i class="fa-solid fa-rotate-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- Timer Switchers -->
-                    <div class="grid grid-cols-2 gap-2 mt-5 pt-5 border-t border-white/5 text-xs font-semibold">
-                        <button id="setPomodoroMode" class="py-2.5 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40">جلسة مذاكرة (25د)</button>
-                        <button id="setBreakMode" class="py-2.5 rounded-xl text-slate-400 hover:bg-indigo-900/40 transition">استراحة (5د)</button>
-                    </div>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total"><i class="fa-solid fa-list-check"></i></div>
+                <div class="stat-info">
+                    <h3 id="statTotal">0</h3>
+                    <p>إجمالي المهام</p>
                 </div>
-
-                <!-- Stats Box -->
-                <div class="glass-card rounded-3xl p-6 shadow-xl">
-                    <h2 class="font-bold text-base text-slate-100 mb-5 flex items-center gap-2.5">
-                        <i class="fa-solid fa-chart-line text-indigo-400"></i>
-                        إحصائيات اليوم
-                    </h2>
-
-                    <div class="grid grid-cols-2 gap-3 mb-5">
-                        <div class="p-4 bg-indigo-950/40 border border-indigo-500/10 rounded-2xl">
-                            <span class="text-xs text-indigo-300/70 block mb-1">وقت التركيز</span>
-                            <div class="text-xl font-black text-indigo-400" id="statStudyTime">0 دقيقة</div>
-                        </div>
-                        <div class="p-4 bg-indigo-950/40 border border-indigo-500/10 rounded-2xl">
-                            <span class="text-xs text-indigo-300/70 block mb-1">المهام المنجزة</span>
-                            <div class="text-xl font-black text-emerald-400" id="statCompletedTasks">0 / 0</div>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div>
-                        <div class="flex justify-between text-xs font-bold mb-2">
-                            <span class="text-slate-400">معدل إنجاز خطة اليوم</span>
-                            <span id="statPercentText" class="text-indigo-400">0%</span>
-                        </div>
-                        <div class="w-full h-3 bg-indigo-950/60 rounded-full overflow-hidden p-0.5 border border-white/5">
-                            <div id="statProgressBar" class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500 w-0"></div>
-                        </div>
-                    </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon done"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="stat-info">
+                    <h3 id="statDone">0</h3>
+                    <p>المهام المكتملة</p>
                 </div>
-
-                <!-- Subjects Filter Box -->
-                <div class="glass-card rounded-3xl p-6 shadow-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="font-bold text-base text-slate-100 flex items-center gap-2.5">
-                            <i class="fa-solid fa-bookmark text-indigo-400"></i>
-                            المواد الدراسية
-                        </h2>
-                        <button id="addSubjectBtn" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold transition">+ مادة جديدة</button>
-                    </div>
-                    <div id="subjectsList" class="flex flex-wrap gap-2">
-                        <!-- Dynamic Subjects -->
-                    </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon time"><i class="fa-solid fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3 id="statTime">0 دقيقة</h3>
+                    <p>المتبقي للمذاكرة</p>
                 </div>
-
-            </aside>
-
-            <!-- Main Content Area (Tasks List) -->
-            <section class="lg:col-span-8 space-y-6">
-
-                <!-- Control Bar (Tabs & Filters) -->
-                <div class="glass-card p-2.5 rounded-2xl flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 shadow-xl">
-                    <!-- Filter Tabs -->
-                    <div class="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-                        <button data-filter="today" class="filter-tab active-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
-                            مهام اليوم
-                        </button>
-                        <button data-filter="upcoming" class="filter-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:bg-indigo-900/40 hover:text-slate-200 transition">
-                            القادمة
-                        </button>
-                        <button data-filter="completed" class="filter-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:bg-indigo-900/40 hover:text-slate-200 transition">
-                            المكتملة
-                        </button>
-                        <button data-filter="all" class="filter-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:bg-indigo-900/40 hover:text-slate-200 transition">
-                            كل المهام
-                        </button>
-                    </div>
-
-                    <!-- Priority Selector -->
-                    <div class="flex items-center gap-2 px-2">
-                        <label for="priorityFilter" class="text-xs text-slate-400 font-medium whitespace-nowrap">الأولوية:</label>
-                        <select id="priorityFilter" class="bg-indigo-950/60 border border-white/10 rounded-xl text-xs p-2 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="all">جميع الأولويات</option>
-                            <option value="high">عالية 🔥</option>
-                            <option value="medium">متوسطة ⚡</option>
-                            <option value="low">منخفضة ☕</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Search Input -->
-                <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-3.5 text-slate-500 text-sm"></i>
-                    <input type="text" id="searchInput" placeholder="ابحث في الدروس والمهام الدراسية..." class="w-full pr-11 pl-4 py-3 rounded-2xl bg-indigo-950/40 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-100 placeholder-slate-500 shadow-inner">
-                </div>
-
-                <!-- Tasks Cards List Container -->
-                <div id="tasksContainer" class="space-y-3.5">
-                    <!-- Dynamic Task Items -->
-                </div>
-
-                <!-- Empty State Block -->
-                <div id="emptyState" class="hidden flex-col items-center justify-center py-16 px-4 text-center glass-card rounded-3xl border border-dashed border-white/10">
-                    <div class="w-16 h-16 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-indigo-400 mb-4 text-2xl border border-indigo-500/20">
-                        <i class="fa-solid fa-list-check"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-200">لا توجد مهام دراسية هنا!</h3>
-                    <p class="text-xs text-slate-400 max-w-sm mt-1.5 leading-relaxed">ابدأ بإضافة دراستك اليومية لتنظيم وقتك بفاعلية والوصول لأفضل أداء.</p>
-                    <button id="emptyStateAddBtn" class="mt-5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl transition shadow-lg shadow-indigo-600/30">إضافة مهمة جديدة</button>
-                </div>
-
-            </section>
-
-        </main>
-    </div>
-
-    <!-- Footer with subtle text credits -->
-    <footer class="py-6 mt-12 border-t border-white/5 bg-indigo-950/50">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-xs text-slate-400/80 font-light tracking-wide">
-                تمت صياغة وتطوير هذا العمل بعناية وشغف بواسطة مصطفى المصري
-            </p>
+            </div>
         </div>
-    </footer>
 
-    <!-- Modal: Add/Edit Task -->
-    <div id="taskModal" class="fixed inset-0 bg-indigo-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="glass-card rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-white/10">
-            <div class="flex justify-between items-center p-5 border-b border-white/10">
-                <h3 id="modalTitle" class="font-bold text-slate-100 flex items-center gap-2.5 text-base">
-                    <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
-                    إضافة مهمة مذاكرة
-                </h3>
-                <button id="closeModalBtn" class="text-slate-400 hover:text-white p-1 transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+        <!-- Main Content -->
+        <div class="main-grid">
+            
+            <div class="left-col">
+                <!-- Task Form Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-plus-circle"></i> إضافة درس أو مهمة جديدة
+                    </div>
+                    <form id="taskForm" class="task-form">
+                        <div class="form-group form-full">
+                            <label>اسم المهمة / الدرس *</label>
+                            <input type="text" id="taskTitle" placeholder="مثال: مذاكرة الفصل الأول كيمياء..." required>
+                        </div>
+                        <div class="form-group">
+                            <label>المادة الدراسية *</label>
+                            <input type="text" id="taskSubject" placeholder="مثال: كيمياء" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الوقت المتوقع (بالدقائق)</label>
+                            <input type="number" id="taskDuration" min="5" value="30" step="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>مستوى الأهمية</label>
+                            <select id="taskPriority">
+                                <option value="low">منخفضة</option>
+                                <option value="medium" selected>متوسطة</option>
+                                <option value="high">عالية جداً</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>تاريخ الإنجاز</label>
+                            <input type="date" id="taskDate" required>
+                        </div>
+                        <button type="submit" class="btn-add">
+                            <i class="fa-solid fa-plus"></i> إضافة إلى خطة المذاكرة
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Task List Card -->
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-tasks"></i> قائمة المهام والدروس
+                    </div>
+
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" onclick="filterTasks('all')">كل المهام</button>
+                        <button class="filter-btn" onclick="filterTasks('active')">قيد المذاكرة</button>
+                        <button class="filter-btn" onclick="filterTasks('completed')">تم إنجازها</button>
+                    </div>
+
+                    <div id="tasksContainer" class="task-list"></div>
+                </div>
             </div>
 
-            <form id="taskForm" class="p-6 space-y-4">
-                <input type="hidden" id="taskId">
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1.5">عنوان المهمة / الدرس *</label>
-                    <input type="text" id="taskTitle" required placeholder="مثال: مراجعة الفصل الأول فيزياء" class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1.5">المادة الدراسية *</label>
-                    <select id="taskSubject" required class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100">
-                        <!-- Dynamic Subjects -->
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1.5">الأولوية</label>
-                        <select id="taskPriority" class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100">
-                            <option value="high">عالية 🔥</option>
-                            <option value="medium" selected>متوسطة ⚡</option>
-                            <option value="low">منخفضة ☕</option>
-                        </select>
+            <!-- Sidebar (Timer) -->
+            <div class="right-col">
+                <div class="card timer-card">
+                    <div class="card-title">
+                        <i class="fa-solid fa-stopwatch"></i> مؤقت التركيز (Pomodoro)
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-1.5">المدة المتوقعة (دقائق)</label>
-                        <input type="number" id="taskDuration" min="5" step="5" value="30" class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100">
+
+                    <div class="timer-modes">
+                        <button class="mode-btn active" onclick="setTimerMode('study')">جلسة مذاكرة (25د)</button>
+                        <button class="mode-btn" onclick="setTimerMode('break')">استراحة (5د)</button>
+                    </div>
+
+                    <div id="timerClock" class="timer-clock">25:00</div>
+
+                    <div class="timer-controls">
+                        <button id="btnStartTimer" class="btn-timer start" onclick="toggleTimer()">ابدأ التركيز</button>
+                        <button class="btn-timer reset" onclick="resetTimer()">إعادة ضبط</button>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1.5">موعد الإنجاز</label>
-                    <input type="datetime-local" id="taskDueDate" class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1.5">ملاحظات جانبية</label>
-                    <textarea id="taskNotes" rows="2" placeholder="ملاحظات، صفحات، أو نقاط هامة..." class="w-full px-4 py-2.5 rounded-xl bg-indigo-950/60 border border-white/10 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-100 resize-none"></textarea>
-                </div>
-
-                <div class="flex gap-2.5 pt-3">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">حفظ المهمة</button>
-                    <button type="button" id="cancelModalBtn" class="bg-indigo-900/50 hover:bg-indigo-900 text-slate-300 font-bold px-5 py-3 rounded-xl text-sm transition">إلغاء</button>
-                </div>
-            </form>
         </div>
     </div>
 
+    <!-- Footer Signature -->
+    <footer class="footer">
+        <p>تمت صياغة وتطوير هذا العمل بعناية وشغف بواسطة <span>مصطفى المصري</span></p>
+    </footer>
+
     <script>
-        // Initial Data
-        const defaultSubjects = ['رياضيات', 'فيزياء', 'كيمياء', 'لغة عربية', 'لغة إنجليزية', 'تاريخ', 'برمجة'];
+        // Tasks Storage
+        let tasks = JSON.parse(localStorage.getItem('my_study_tasks')) || [];
+        let activeFilter = 'all';
 
-        let state = {
-            tasks: JSON.parse(localStorage.getItem('study_tasks')) || [],
-            subjects: JSON.parse(localStorage.getItem('study_subjects')) || defaultSubjects,
-            filterStatus: 'today',
-            filterPriority: 'all',
-            filterSubject: 'all',
-            searchQuery: '',
-            timer: {
-                minutes: 25,
-                seconds: 0,
-                totalSeconds: 25 * 60,
-                isRunning: false,
-                mode: 'pomodoro',
-                intervalId: null,
-                activeTaskId: null
-            },
-            stats: JSON.parse(localStorage.getItem('study_stats')) || {
-                totalMinutesStudied: 0,
-                lastResetDate: new Date().toDateString()
-            }
-        };
+        // Timer Variables
+        let timerInterval = null;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+        let currentMode = 'study';
 
-        const tasksContainer = document.getElementById('tasksContainer');
-        const emptyState = document.getElementById('emptyState');
-        const subjectsList = document.getElementById('subjectsList');
-        const taskModal = document.getElementById('taskModal');
-        const taskForm = document.getElementById('taskForm');
+        // Set Default Date Today
+        document.getElementById('taskDate').valueAsDate = new Date();
 
-        document.addEventListener('DOMContentLoaded', () => {
-            checkDailyStatsReset();
-            renderSubjects();
+        // Save & Render
+        function saveAndRender() {
+            localStorage.setItem('my_study_tasks', JSON.stringify(tasks));
             renderTasks();
-            updateStatsUI();
-            setupEventListeners();
-            updateTimerDisplay();
+            updateStats();
+        }
+
+        // Add Task
+        document.getElementById('taskForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newTask = {
+                id: Date.now(),
+                title: document.getElementById('taskTitle').value,
+                subject: document.getElementById('taskSubject').value,
+                duration: parseInt(document.getElementById('taskDuration').value),
+                priority: document.getElementById('taskPriority').value,
+                date: document.getElementById('taskDate').value,
+                completed: false
+            };
+            tasks.unshift(newTask);
+            saveAndRender();
+            e.target.reset();
+            document.getElementById('taskDate').valueAsDate = new Date();
         });
 
-        function checkDailyStatsReset() {
-            const today = new Date().toDateString();
-            if (state.stats.lastResetDate !== today) {
-                state.stats.totalMinutesStudied = 0;
-                state.stats.lastResetDate = today;
-                saveStats();
-            }
-        }
-
-        function saveTasks() { localStorage.setItem('study_tasks', JSON.stringify(state.tasks)); }
-        function saveSubjects() { localStorage.setItem('study_subjects', JSON.stringify(state.subjects)); }
-        function saveStats() { localStorage.setItem('study_stats', JSON.stringify(state.stats)); }
-
-        function renderSubjects() {
-            subjectsList.innerHTML = '';
-            
-            const allBtn = document.createElement('button');
-            allBtn.className = `px-3 py-1.5 rounded-xl text-xs font-bold transition ${state.filterSubject === 'all' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-indigo-950/60 text-slate-400 hover:bg-indigo-900/50 hover:text-slate-200'}`;
-            allBtn.innerText = 'الكل';
-            allBtn.onclick = () => { state.filterSubject = 'all'; renderSubjects(); renderTasks(); };
-            subjectsList.appendChild(allBtn);
-
-            state.subjects.forEach(sub => {
-                const btn = document.createElement('button');
-                const isActive = state.filterSubject === sub;
-                btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold transition ${isActive ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-indigo-950/60 text-slate-400 hover:bg-indigo-900/50 hover:text-slate-200'}`;
-                btn.innerText = sub;
-                btn.onclick = () => { state.filterSubject = sub; renderSubjects(); renderTasks(); };
-                subjectsList.appendChild(btn);
+        // Toggle Task
+        function toggleTask(id) {
+            tasks = tasks.map(t => {
+                if (t.id === id) {
+                    const isDone = !t.completed;
+                    if (isDone && typeof confetti === 'function') {
+                        confetti({ particleCount: 70, spread: 60, origin: { y: 0.8 } });
+                    }
+                    return { ...t, completed: isDone };
+                }
+                return t;
             });
-
-            const select = document.getElementById('taskSubject');
-            select.innerHTML = state.subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+            saveAndRender();
         }
 
-        function addNewSubject() {
-            const name = prompt('أدخل اسم المادة الدراسية الجديدة:');
-            if (name && name.trim() && !state.subjects.includes(name.trim())) {
-                state.subjects.push(name.trim());
-                saveSubjects();
-                renderSubjects();
-            }
+        // Delete Task
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveAndRender();
         }
 
-        function getFilteredTasks() {
-            const todayStr = new Date().toISOString().split('T')[0];
+        // Filter
+        function filterTasks(type) {
+            activeFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick').includes(type));
+            });
+            renderTasks();
+        }
 
-            return state.tasks.filter(task => {
-                if (state.searchQuery && !task.title.toLowerCase().includes(state.searchQuery.toLowerCase())) return false;
-                if (state.filterPriority !== 'all' && task.priority !== state.filterPriority) return false;
-                if (state.filterSubject !== 'all' && task.subject !== state.filterSubject) return false;
+        // Render Tasks HTML
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            container.innerHTML = '';
 
-                if (state.filterStatus === 'completed') return task.completed;
-                if (state.filterStatus === 'today') {
-                    if (task.completed) return false;
-                    if (!task.dueDate) return true;
-                    return task.dueDate.startsWith(todayStr);
-                }
-                if (state.filterStatus === 'upcoming') {
-                    if (task.completed) return false;
-                    if (!task.dueDate) return false;
-                    return task.dueDate > todayStr;
-                }
-
+            let filtered = tasks.filter(t => {
+                if (activeFilter === 'active') return !t.completed;
+                if (activeFilter === 'completed') return t.completed;
                 return true;
             });
-        }
-
-        function renderTasks() {
-            const filtered = getFilteredTasks();
-            tasksContainer.innerHTML = '';
 
             if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-            } else {
-                emptyState.classList.add('hidden');
-                emptyState.classList.remove('flex');
-
-                filtered.forEach(task => {
-                    tasksContainer.appendChild(createTaskCardHTML(task));
-                });
+                container.innerHTML = `<p style="text-align:center; color: var(--text-muted); padding:15px; font-size:0.85rem;">لا توجد مهام حتّى الآن.</p>`;
+                return;
             }
 
-            updateStatsUI();
-        }
+            const priorityText = { low: 'منخفضة', medium: 'متوسطة', high: 'عالية' };
 
-        function createTaskCardHTML(task) {
-            const div = document.createElement('div');
-            div.className = `glass-card glass-card-hover p-4 rounded-2xl flex flex-col gap-3 ${
-                task.completed ? 'opacity-50' : ''
-            }`;
-
-            const priorityBadge = {
-                high: '<span class="text-xs px-2.5 py-0.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold">عالية 🔥</span>',
-                medium: '<span class="text-xs px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">متوسطة ⚡</span>',
-                low: '<span class="text-xs px-2.5 py-0.5 rounded-lg bg-slate-500/20 text-slate-300 border border-slate-500/30 font-bold">منخفضة ☕</span>'
-            }[task.priority];
-
-            let formattedDate = '';
-            if (task.dueDate) {
-                const dateObj = new Date(task.dueDate);
-                formattedDate = dateObj.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-            }
-
-            const isTimerActive = state.timer.activeTaskId === task.id;
-
-            div.innerHTML = `
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-start gap-3 flex-1">
-                        <button onclick="toggleTaskComplete('${task.id}')" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition ${
-                            task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-600 hover:border-indigo-400'
-                        }">
-                            ${task.completed ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
-                        </button>
-                        
-                        <div class="space-y-1.5 flex-1">
-                            <h4 class="font-bold text-sm text-slate-100 ${task.completed ? 'line-through text-slate-400' : ''}">
-                                ${escapeHtml(task.title)}
-                            </h4>
-                            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                                <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md font-semibold">${escapeHtml(task.subject)}</span>
-                                ${priorityBadge}
-                                <span class="flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${task.duration} دقيقة</span>
-                                ${formattedDate ? `<span class="flex items-center gap-1 text-slate-400"><i class="fa-regular fa-calendar"></i> ${formattedDate}</span>` : ''}
+            filtered.forEach(task => {
+                const item = document.createElement('div');
+                item.className = `task-item ${task.completed ? 'completed' : ''}`;
+                item.innerHTML = `
+                    <div class="task-left">
+                        <div class="checkbox-custom" onclick="toggleTask(${task.id})">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <div class="task-title">${escapeHtml(task.title)}</div>
+                            <div class="task-badges">
+                                <span class="badge subj">${escapeHtml(task.subject)}</span>
+                                <span class="badge ${task.priority}">${priorityText[task.priority]}</span>
+                                <span class="badge"><i class="fa-regular fa-clock"></i> ${task.duration} دقيقة</span>
                             </div>
-                            ${task.notes ? `<p class="text-xs text-slate-400 bg-indigo-950/40 p-2.5 rounded-xl border border-white/5 mt-1">${escapeHtml(task.notes)}</p>` : ''}
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-1">
-                        <button onclick="attachTaskToTimer('${task.id}')" title="ربط بمؤقت المذاكرة" class="p-2 rounded-xl text-slate-400 hover:text-indigo-400 hover:bg-indigo-900/40 transition ${isTimerActive ? 'text-indigo-400 font-bold bg-indigo-900/50' : ''}">
-                            <i class="fa-solid fa-stopwatch"></i>
-                        </button>
-                        <button onclick="editTask('${task.id}')" class="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-indigo-900/40 transition">
-                            <i class="fa-solid fa-pen text-xs"></i>
-                        </button>
-                        <button onclick="deleteTask('${task.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition">
-                            <i class="fa-solid fa-trash text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            return div;
+                    <button class="btn-delete" onclick="deleteTask(${task.id})" title="حذف المهمة">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
         }
 
         function escapeHtml(str) {
-            return str ? str.replace(/[&<>"']/g, function(m) {
+            return str.replace(/[&<>"']/g, function(m) {
                 return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            }) : '';
+            });
         }
 
-        function toggleTaskComplete(id) {
-            const task = state.tasks.find(t => t.id === id);
-            if (task) {
-                task.completed = !task.completed;
-                if (task.completed) {
-                    confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
-                }
-                saveTasks();
-                renderTasks();
-            }
+        // Stats
+        function updateStats() {
+            document.getElementById('statTotal').innerText = tasks.length;
+            document.getElementById('statDone').innerText = tasks.filter(t => t.completed).length;
+            const remTime = tasks.reduce((sum, t) => sum + (t.completed ? 0 : t.duration), 0);
+            document.getElementById('statTime').innerText = `${remTime} دقيقة`;
         }
 
-        function deleteTask(id) {
-            if (confirm('هل ترغب بتأكيد حذف هذه المهمة؟')) {
-                state.tasks = state.tasks.filter(t => t.id !== id);
-                if (state.timer.activeTaskId === id) {
-                    state.timer.activeTaskId = null;
-                    document.getElementById('activeTaskLabel').innerText = 'بدون مهمة محددة';
-                }
-                saveTasks();
-                renderTasks();
-            }
-        }
-
-        function editTask(id) {
-            const task = state.tasks.find(t => t.id === id);
-            if (!task) return;
-
-            document.getElementById('taskId').value = task.id;
-            document.getElementById('taskTitle').value = task.title;
-            document.getElementById('taskSubject').value = task.subject;
-            document.getElementById('taskPriority').value = task.priority;
-            document.getElementById('taskDuration').value = task.duration;
-            document.getElementById('taskDueDate').value = task.dueDate || '';
-            document.getElementById('taskNotes').value = task.notes || '';
-
-            document.getElementById('modalTitle').innerText = 'تعديل المهمة الدراسية';
-            taskModal.classList.remove('hidden');
-        }
-
-        taskForm.onsubmit = (e) => {
-            e.preventDefault();
-            const id = document.getElementById('taskId').value;
-            const title = document.getElementById('taskTitle').value.trim();
-            const subject = document.getElementById('taskSubject').value;
-            const priority = document.getElementById('taskPriority').value;
-            const duration = parseInt(document.getElementById('taskDuration').value) || 30;
-            const dueDate = document.getElementById('taskDueDate').value;
-            const notes = document.getElementById('taskNotes').value.trim();
-
-            if (id) {
-                const task = state.tasks.find(t => t.id === id);
-                if (task) {
-                    task.title = title;
-                    task.subject = subject;
-                    task.priority = priority;
-                    task.duration = duration;
-                    task.dueDate = dueDate;
-                    task.notes = notes;
-                }
-            } else {
-                const newTask = {
-                    id: Date.now().toString(),
-                    title,
-                    subject,
-                    priority,
-                    duration,
-                    dueDate,
-                    notes,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                };
-                state.tasks.push(newTask);
-            }
-
-            saveTasks();
-            renderTasks();
-            closeModal();
-        };
-
-        function closeModal() {
-            taskModal.classList.add('hidden');
-            taskForm.reset();
-            document.getElementById('taskId').value = '';
-            document.getElementById('modalTitle').innerText = 'إضافة مهمة مذاكرة جديدة';
-        }
-
-        function attachTaskToTimer(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
-            if (task) {
-                state.timer.activeTaskId = taskId;
-                document.getElementById('activeTaskLabel').innerText = `مرتبطة بـ: ${task.title}`;
-                renderTasks();
-            }
-        }
-
-        function updateTimerDisplay() {
-            const mins = Math.floor(state.timer.totalSeconds / 60);
-            const secs = state.timer.totalSeconds % 60;
-            document.getElementById('timerDisplay').innerText = 
-                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-            const total = state.timer.mode === 'pomodoro' ? 25 * 60 : 5 * 60;
-            const progressFraction = state.timer.totalSeconds / total;
-            const circle = document.getElementById('timerCircle');
-            const circumference = 283;
-            circle.style.strokeDashoffset = circumference - (progressFraction * circumference);
-        }
-
-        function toggleTimer() {
-            if (state.timer.isRunning) {
-                pauseTimer();
-            } else {
-                startTimer();
-            }
-        }
-
-        function startTimer() {
-            state.timer.isRunning = true;
-            document.getElementById('playPauseIcon').className = 'fa-solid fa-pause';
-            document.getElementById('playPauseText').innerText = 'إيقاف مؤقت';
-
-            state.timer.intervalId = setInterval(() => {
-                if (state.timer.totalSeconds > 0) {
-                    state.timer.totalSeconds--;
-                    updateTimerDisplay();
-                } else {
-                    clearInterval(state.timer.intervalId);
-                    state.timer.isRunning = false;
-                    
-                    if (state.timer.mode === 'pomodoro') {
-                        state.stats.totalMinutesStudied += 25;
-                        saveStats();
-                        updateStatsUI();
-                        setTimerMode('break');
-                    } else {
-                        setTimerMode('pomodoro');
-                    }
-                }
-            }, 1000);
-        }
-
-        function pauseTimer() {
-            state.timer.isRunning = false;
-            clearInterval(state.timer.intervalId);
-            document.getElementById('playPauseIcon').className = 'fa-solid fa-play';
-            document.getElementById('playPauseText').innerText = 'استئناف';
-        }
-
-        function resetTimer() {
-            pauseTimer();
-            state.timer.totalSeconds = state.timer.mode === 'pomodoro' ? 25 * 60 : 5 * 60;
-            updateTimerDisplay();
+        // Timer Logic
+        function updateTimerClock() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timerClock').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
         function setTimerMode(mode) {
-            pauseTimer();
-            state.timer.mode = mode;
-            if (mode === 'pomodoro') {
-                state.timer.totalSeconds = 25 * 60;
-                document.getElementById('timerModeLabel').innerText = 'جلسة مذاكرة';
-                document.getElementById('setPomodoroMode').className = 'py-2.5 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 font-bold';
-                document.getElementById('setBreakMode').className = 'py-2.5 rounded-xl text-slate-400 hover:bg-indigo-900/40 transition';
-            } else {
-                state.timer.totalSeconds = 5 * 60;
-                document.getElementById('timerModeLabel').innerText = 'استراحة قصيرة';
-                document.getElementById('setBreakMode').className = 'py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold';
-                document.getElementById('setPomodoroMode').className = 'py-2.5 rounded-xl text-slate-400 hover:bg-indigo-900/40 transition';
-            }
-            updateTimerDisplay();
-        }
+            currentMode = mode;
+            isRunning = false;
+            clearInterval(timerInterval);
+            document.getElementById('btnStartTimer').innerText = 'ابدأ التركيز';
 
-        function updateStatsUI() {
-            const totalTasks = state.tasks.length;
-            const completedTasks = state.tasks.filter(t => t.completed).length;
-            const percent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
-
-            document.getElementById('statStudyTime').innerText = `${state.stats.totalMinutesStudied} دقيقة`;
-            document.getElementById('statCompletedTasks').innerText = `${completedTasks} / ${totalTasks}`;
-            document.getElementById('statPercentText').innerText = `${percent}%`;
-            document.getElementById('statProgressBar').style.width = `${percent}%`;
-        }
-
-        function setupEventListeners() {
-            document.getElementById('openNewTaskModal').onclick = () => {
-                taskForm.reset();
-                document.getElementById('taskId').value = '';
-                document.getElementById('modalTitle').innerText = 'إضافة مهمة مذاكرة جديدة';
-                taskModal.classList.remove('hidden');
-            };
-            document.getElementById('closeModalBtn').onclick = closeModal;
-            document.getElementById('cancelModalBtn').onclick = closeModal;
-            document.getElementById('emptyStateAddBtn').onclick = () => document.getElementById('openNewTaskModal').click();
-
-            document.querySelectorAll('.filter-tab').forEach(btn => {
-                btn.onclick = (e) => {
-                    document.querySelectorAll('.filter-tab').forEach(b => {
-                        b.className = 'filter-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:bg-indigo-900/40 hover:text-slate-200 transition';
-                    });
-                    e.target.className = 'filter-tab active-tab px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow-md shadow-indigo-600/30';
-                    state.filterStatus = e.target.dataset.filter;
-                    renderTasks();
-                };
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('onclick').includes(mode));
             });
 
-            document.getElementById('priorityFilter').onchange = (e) => {
-                state.filterPriority = e.target.value;
-                renderTasks();
-            };
-
-            document.getElementById('searchInput').oninput = (e) => {
-                state.searchQuery = e.target.value.trim();
-                renderTasks();
-            };
-
-            document.getElementById('addSubjectBtn').onclick = addNewSubject;
-
-            document.getElementById('toggleTimerBtn').onclick = toggleTimer;
-            document.getElementById('resetTimerBtn').onclick = resetTimer;
-            document.getElementById('setPomodoroMode').onclick = () => setTimerMode('pomodoro');
-            document.getElementById('setBreakMode').onclick = () => setTimerMode('break');
+            timeLeft = (mode === 'study') ? 25 * 60 : 5 * 60;
+            updateTimerClock();
         }
+
+        function toggleTimer() {
+            const btn = document.getElementById('btnStartTimer');
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                btn.innerText = 'استئناف';
+            } else {
+                isRunning = true;
+                btn.innerText = 'إيقاف مؤقت';
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerClock();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        alert(currentMode === 'study' ? 'ممتاز! انتهت جلسة المذاكرة.' : 'انتهت الاستراحة! عد للتركيز.');
+                        setTimerMode(currentMode === 'study' ? 'break' : 'study');
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            setTimerMode(currentMode);
+        }
+
+        // Feature: Direct HTML File Download
+        document.getElementById('downloadAppBtn').onclick = () => {
+            const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'study_planner.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+
+        // Initialize
+        renderTasks();
+        updateStats();
     </script>
 </body>
 </html>
